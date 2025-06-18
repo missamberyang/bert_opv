@@ -120,6 +120,7 @@ def safe_index(alist, elem):
     try:
         return alist.index(elem)
     except ValueError:
+        #this index assignment to unknown element can be problematic
         return len(alist) - 1
 
 

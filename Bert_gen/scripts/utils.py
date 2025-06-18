@@ -51,6 +51,66 @@ class Compound3DKit(object):
             pos = conf.GetAtomPosition(i)
             atom_poses.append([pos.x,pos.y,pos.z])
         return atom_poses
+def get_bond_feature_dims(list_acquired_feature_names):
+    """
+    This function returns the dimension of bond features. self loop is added as an additional feature (+1) 
+    e.g. map(len,..) loops over [
+    {"SINGLE": 0, "DOUBLE": 1, "TRIPLE": 2, "AROMATIC": 3},
+    {"NONE": 0, "ENDUPRIGHT": 1, "ENDDOWNRIGHT": 2}
+]
+    """
+    list_bond_feat_dim = list(map(len, [CompoundKit.bond_vocab_dict[name] for name in list_acquired_feature_names]))
+    # +1 for self loop edges
+    return [_l + 1 for _l in list_bond_feat_dim]
+
+def rdchem_enum_to_list(values):
+    return [values[i] for i in range(len(values))]
+
+
+class CompoundKit(object):
+    """
+    rdchem.ChiralType.values returns: 
+    [rdchem.ChiralType.CHI_UNSPECIFIED,
+    rdchem.ChiralType.CHI_TETRAHEDRAL_CW,
+    rdchem.ChiralType.CHI_TETRAHEDRAL_CCW,
+    rdchem.ChiralType.CHI_OTHER]
+    these are RDKit enum values, use enum_value.name and enum_value.value to get both name and values """
+
+    atom_vacab_dict= {
+    "atomic_num":list(range(1,119))+ ['misc'],
+    "chiral_tag":rdchem_enum_to_list(rdchem.ChiralType.values),
+}
+    bond_voca_dict = {
+        "bind_"
+
+
+
+
+
+    }
+
+
+def mol_to_graph_data(mol):
+    return
+
+    
+def safe_index(alist,elem):
+    """
+    return the index of an element in a list.
+    """
+    if elem in alist: 
+        return alist.index(elem)
+    else: 
+        #this is a modified version 
+        raise ValueError(f"Element '{elem}' not found in list")
+
+
+
+
+
+def gen_adj():
+    return
+
 
 def mol_to_geognn_graph_data(mol: Mol, atom_poses, dir_type):
     if len(mol.GetAtoms()) == 0:
@@ -58,7 +118,9 @@ def mol_to_geognn_graph_data(mol: Mol, atom_poses, dir_type):
         return None
     data = mol_to_graph_data(mol) 
     data['atom_pos'] = np.array(atom_poses, dtype=np.float32)
-    data['bind_length'] = Compound3DKit.get_bond_lengths(data['edges'],data['atom_pos'])
+    data['bond_length'] = Compound3DKit.get_bond_lengths(data['edges'],data['atom_pos'])
+    data['adj_node'] = gen_adj(len(data['atoms']),data['edges'],data['bond_length'])
+    return data['atoms'],data['adj_node']
     
 
 
